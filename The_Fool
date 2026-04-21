@@ -1,1 +1,65 @@
-jgcdgj
+import pyautogui
+import random
+import time
+import math
+
+# Safety: Moving the mouse to any corner of the screen will abort the script
+pyautogui.FAILSAFE = True
+
+def human_move(x2, y2, steps=30):
+    """Moves the mouse in a non-linear, curved path to a destination."""
+    x1, y1 = pyautogui.position()
+    
+    # Create a random 'control point' to create a curve (Bezier-ish)
+    control_x = (x1 + x2) / 2 + random.randint(-200, 200)
+    control_y = (y1 + y2) / 2 + random.randint(-200, 200)
+    
+    for i in range(steps + 1):
+        t = i / steps
+        # Quadratic Bezier formula
+        target_x = (1-t)**2 * x1 + 2*(1-t)*t * control_x + t**2 * x2
+        target_y = (1-t)**2 * y1 + 2*(1-t)*t * control_y + t**2 * y2
+        
+        pyautogui.moveTo(target_x, target_y)
+        # Random micro-delays between steps to simulate variable speed
+        time.sleep(random.uniform(0.001, 0.005))
+
+def simulate_activity():
+    width, height = pyautogui.size()
+    print("Simulation started. Press Ctrl+C in VS Code or move mouse to a corner to stop.")
+    
+    try:
+        while True:
+            # 1. Randomized Movement
+            target_x = random.randint(100, width - 100)
+            target_y = random.randint(100, height - 100)
+            human_move(target_x, target_y)
+            
+            # 2. Randomized "Thinking" Time (Idle)
+            # This is key: humans don't move constantly.
+            time.sleep(random.uniform(2, 10))
+            
+            # 3. Contextual Clicks
+            # We only click occasionally so we don't accidentally close windows.
+            if random.random() > 0.7: 
+                pyautogui.click()
+                print("Performed a random click.")
+
+            # 4. Bonus Trick: The "Work" Simulation (Scrolling)
+            # Simulates reading a document or webpage.
+            if random.random() > 0.5:
+                scroll_amount = random.randint(100, 400)
+                pyautogui.scroll(-scroll_amount if random.random() > 0.5 else scroll_amount)
+                print(f"Simulated scrolling.")
+
+            # 5. Bonus Trick: Non-Destructive Keystroke
+            # Presses the 'Shift' key—it refreshes timers without typing characters.
+            if random.random() > 0.8:
+                pyautogui.press('shift')
+                print("Simulated keystroke (Shift).")
+                
+    except KeyboardInterrupt:
+        print("\nSimulation ended by user.")
+
+if __name__ == "__main__":
+    simulate_activity()
